@@ -1,15 +1,13 @@
-// import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,7 +21,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({ Key key , this.title }) : super(key: key);
+  MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
@@ -37,16 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => InsertScreen(),
-            )),
-      ),
-      body: FutureBuilder(
-        future: Firestore.instance.collection('todo').getDocuments(), 
+      body: StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance.collection('todo').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
@@ -55,16 +45,32 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           }
-           return ListView.builder(
+          return ListView.builder(
             itemCount: snapshot.data.documents.length,
             itemBuilder: (context, index) {
-              return ListTile(
+              return Dismissible(
+                key: Key(snapshot.data.documents[index].documentID),
+                background: Container(color: Colors.red,),
+                onDismissed: (direction) async {
+                  Firestore.instance.collection('todo').document(snapshot.data.documents[index].documentID).delete();
+                },
+                child: ListTile(
                   title: Text(snapshot.data.documents[index]['task']),
-                subtitle: Text(snapshot.data.documents[index]['description']),
+                  subtitle: Text(snapshot.data.documents[index]['description']),
+                ),
               );
             },
           );
-        },),
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InsertScreen(),
+            )),
+      ),
     );
   }
 }
