@@ -322,12 +322,13 @@ class InsertScreenState extends State<InsertScreen> {
 }
 
   class UpdateScreen extends StatefulWidget {
-    final String Task;
-    final String Description;
-    final String Id;
+    String Task;
+    String Description;
+    String Id;
 
-    const UpdateScreen({ key, this.Task, this.Description, this.Id }) : super(key: key);
+    UpdateScreen({ this.Task, this.Description, this.Id });
   
+    
     @override
     _UpdateScreenState createState() => _UpdateScreenState();
   }
@@ -336,6 +337,15 @@ class InsertScreenState extends State<InsertScreen> {
   final insertFormKey = GlobalKey<FormState>();
   TextEditingController titleTaskController = TextEditingController();
   TextEditingController descTaskController = TextEditingController();
+  
+  @override
+  void initState() {
+    print(widget.Description);
+      // TODO: implement initState
+      titleTaskController.text=widget.Task;
+      titleTaskController.text=widget.Description;
+      super.initState();
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -366,7 +376,7 @@ class InsertScreenState extends State<InsertScreen> {
                 height: 8,
               ),
               TextFormField(
-                initialValue: widget.Task,
+                // initialValue: widget.Task,
                 validator: (value) {
                   if (value.isEmpty || value.trim().length == 0) {
                     return "Task name cannot be empty";
@@ -395,7 +405,7 @@ class InsertScreenState extends State<InsertScreen> {
                 height: 8,
               ),
               TextFormField(
-                initialValue: widget.Description,
+                // initialValue: widget.Description,
                 controller: descTaskController,
                 validator: (value) {
                   if (value.isEmpty || value.trim().length == 0) {
